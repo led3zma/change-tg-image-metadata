@@ -7,8 +7,12 @@ pub fn read_image_path(path: &str) -> Result<Vec<OsString>, Box<dyn std_error>> 
         .filter(|file| file.is_ok())
         .map(|entry| {
             entry
-                .map(|file| file.file_name()) // Probably should need the file path
+                .map(|file| file.path().into_os_string())
                 .expect("Should only contain OK values")
+        })
+        .filter(|path| {
+            let path = &path.to_str().unwrap();
+            path.contains(".jpg") || path.contains(".png") || path.contains(".jpeg")
         })
         .collect())
 }
@@ -19,20 +23,20 @@ mod tests {
 
     #[test]
     fn handle_invalid_image_path() {
-        let path = "./tests/20230224_182502.jpg";
+        let path = "./test_folder/20230224_182502.jpg";
         assert!(read_image_path(path).is_err());
     }
 
     #[test]
     fn collect_only_images() {
-        let path = "./tests/";
+        let path = "./test_folder/";
         assert!(
             read_image_path(path)
                 .unwrap()
                 .iter()
                 .filter(|&file| {
                     let file = &file.to_str().unwrap();
-                    !file.contains(".jpg") || !file.contains(".png") || !file.contains(".jpeg")
+                    !file.contains(".jpg") && !file.contains(".png") && !file.contains(".jpeg")
                 })
                 .collect::<Vec<_>>()
                 .len()
