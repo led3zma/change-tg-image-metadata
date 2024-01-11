@@ -8,4 +8,3 @@ edition = "2021"
 [dependencies]
 chrono = "0.4.31"
 filetime = "0.2.22"
-regex = "1.10.2"
