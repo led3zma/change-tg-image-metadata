@@ -17,6 +17,23 @@ pub fn read_image_path(path: &str) -> Result<Vec<OsString>, Box<dyn std_error>> 
         .collect())
 }
 
+/// Reads the path of a file and extracts the datetime from the file name
+/// Since the file name has the following known format: photo_XX@XX-XX-XXXX_XX-XX-XX.jpg
+/// we can take advantage of this by just reverse splitting the string until the @ and stripping the file extension
+///
+/// NOTE: If for some reason the telegram file export changes this format, it would be better to use regex to match
+/// the date and time in the string
+pub fn extract_datetime(file_path: OsString) -> Option<String> {
+    Some(
+        file_path
+            .to_str()?
+            .rsplit_once("@")?
+            .1
+            .strip_suffix(".jpg")?
+            .to_string(),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -41,6 +58,15 @@ mod tests {
                 .collect::<Vec<_>>()
                 .len()
                 == 0
+        );
+    }
+
+    #[test]
+    fn extract_raw_datetime_from_filename() {
+        let image_file = read_image_path("./test_folder/").unwrap().pop().unwrap();
+        assert_eq!(
+            String::from("17-08-2020_11-47-27"),
+            extract_datetime(image_file).unwrap()
         );
     }
 }
