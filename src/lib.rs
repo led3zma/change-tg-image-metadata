@@ -1,6 +1,7 @@
 use std::{error::Error as std_error, ffi::OsString, fs, path::Path};
 
 use chrono::NaiveDateTime;
+use filetime::FileTime;
 
 /// Reads a path and returns a Vec containing every file in it
 /// TODO: filter to return only images
@@ -20,13 +21,24 @@ pub fn read_image_path(path: &str) -> Result<Vec<OsString>, Box<dyn std_error>> 
         .collect())
 }
 
+/// Gets a file path and updates its modified time metadata by extracting the datetime in its file name and parsing it into timestamp
+pub fn update_time_metadata(file_path: OsString) -> Result<(), std::io::Error> {
+    filetime::set_file_mtime(
+        &file_path,
+        FileTime::from_unix_time(
+            get_timestamp(extract_datetime(&file_path).unwrap()).unwrap(),
+            0,
+        ),
+    )
+}
+
 /// Reads the path of a file and extracts the datetime from the file name
 /// Since the file name has the following known format: photo_XX@XX-XX-XXXX_XX-XX-XX.jpg
 /// we can take advantage of this by just reverse splitting the string until the @ and stripping the file extension
 ///
 /// NOTE: If for some reason the telegram file export changes this format, it would be better to use regex to match
 /// the date and time in the string
-pub fn extract_datetime(file_path: &OsString) -> Option<String> {
+fn extract_datetime(file_path: &OsString) -> Option<String> {
     Some(
         Path::new(&file_path)
             .file_stem()?
@@ -38,7 +50,7 @@ pub fn extract_datetime(file_path: &OsString) -> Option<String> {
 }
 
 /// Return the timestamp equivalent of the raw datetime extracted from a file name
-pub fn get_timestamp(datetime: String) -> Result<i64, chrono::ParseError> {
+fn get_timestamp(datetime: String) -> Result<i64, chrono::ParseError> {
     Ok(
         NaiveDateTime::parse_from_str(&datetime, "%d-%m-%Y_%H-%M-%S")
             .unwrap()
@@ -99,14 +111,8 @@ mod tests {
         let image_file = read_image_path("./test_folder").unwrap().pop().unwrap();
         // Just to ensure it has an arbitrary modification time before setting the actual time
         filetime::set_file_mtime(&image_file, FileTime::from_unix_time(100000, 0)).unwrap();
-        filetime::set_file_mtime(
-            &image_file,
-            FileTime::from_unix_time(
-                get_timestamp(extract_datetime(&image_file).unwrap()).unwrap(),
-                0,
-            ),
-        )
-        .unwrap();
+        update_time_metadata(image_file).unwrap();
+        let image_file = read_image_path("./test_folder").unwrap().pop().unwrap();
         let image_last_mod_time =
             FileTime::from_last_modification_time(&fs::metadata(image_file).unwrap());
         assert_eq!(1609441200, image_last_mod_time.seconds());
