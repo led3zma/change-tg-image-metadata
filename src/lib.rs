@@ -40,7 +40,7 @@ mod tests {
 
     #[test]
     fn handle_invalid_image_path() {
-        let path = "./test_folder/20230224_182502.jpg";
+        let path = "./test_folder/Image_test.png";
         assert!(read_image_path(path).is_err());
     }
 
