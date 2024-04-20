@@ -1,9 +1,14 @@
 use clap::{command, Parser};
-use filetime::FileTime;
-use std::fs;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 #[command(version, about)]
-struct Args {}
+struct Args {
+    /// Path where the images are located
+    path: String,
+}
 
-fn main() {}
+fn main() {
+    let args = Args::parse();
+
+    println!("{:?}", args);
+}
