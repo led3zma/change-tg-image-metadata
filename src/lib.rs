@@ -1,5 +1,7 @@
 use std::{error::Error as std_error, ffi::OsString, fs, path::Path};
 
+use chrono::NaiveDateTime;
+
 /// Reads a path and returns a Vec containing every file in it
 /// TODO: filter to return only images
 pub fn read_image_path(path: &str) -> Result<Vec<OsString>, Box<dyn std_error>> {
@@ -32,6 +34,15 @@ pub fn extract_datetime(file_path: OsString) -> Option<String> {
             .rsplit_once("@")?
             .1
             .to_string(),
+    )
+}
+
+/// Return the timestamp equivalent of the raw datetime extracted from a file name
+pub fn get_timestamp(datetime: String) -> Result<i64, chrono::ParseError> {
+    Ok(
+        NaiveDateTime::parse_from_str(&datetime, "%d-%m-%Y_%H-%M-%S")
+            .unwrap()
+            .timestamp(),
     )
 }
 
@@ -72,5 +83,12 @@ mod tests {
             String::from("31-12-2020_19-00-00"),
             extract_datetime(image_file).unwrap()
         );
+    }
+
+    #[test]
+    fn get_timestamp_from_filename_raw_datetime() {
+        let image_datetime =
+            extract_datetime(read_image_path("./test_folder/").unwrap().pop().unwrap()).unwrap();
+        assert_eq!(1609441200, get_timestamp(image_datetime).unwrap());
     }
 }
