@@ -26,7 +26,7 @@ pub fn read_image_path(path: &str) -> Result<Vec<OsString>, Box<dyn std_error>> 
 ///
 /// NOTE: If for some reason the telegram file export changes this format, it would be better to use regex to match
 /// the date and time in the string
-pub fn extract_datetime(file_path: OsString) -> Option<String> {
+pub fn extract_datetime(file_path: &OsString) -> Option<String> {
     Some(
         Path::new(&file_path)
             .file_stem()?
@@ -48,6 +48,8 @@ pub fn get_timestamp(datetime: String) -> Result<i64, chrono::ParseError> {
 
 #[cfg(test)]
 mod tests {
+    use filetime::FileTime;
+
     use super::*;
 
     #[test]
@@ -81,14 +83,32 @@ mod tests {
         let image_file = read_image_path("./test_folder/").unwrap().pop().unwrap();
         assert_eq!(
             String::from("31-12-2020_19-00-00"),
-            extract_datetime(image_file).unwrap()
+            extract_datetime(&image_file).unwrap()
         );
     }
 
     #[test]
     fn get_timestamp_from_filename_raw_datetime() {
         let image_datetime =
-            extract_datetime(read_image_path("./test_folder/").unwrap().pop().unwrap()).unwrap();
+            extract_datetime(&read_image_path("./test_folder/").unwrap().pop().unwrap()).unwrap();
         assert_eq!(1609441200, get_timestamp(image_datetime).unwrap());
+    }
+
+    #[test]
+    fn change_modified_time_from_file_metadata() {
+        let image_file = read_image_path("./test_folder").unwrap().pop().unwrap();
+        // Just to ensure it has an arbitrary modification time before setting the actual time
+        filetime::set_file_mtime(&image_file, FileTime::from_unix_time(100000, 0)).unwrap();
+        filetime::set_file_mtime(
+            &image_file,
+            FileTime::from_unix_time(
+                get_timestamp(extract_datetime(&image_file).unwrap()).unwrap(),
+                0,
+            ),
+        )
+        .unwrap();
+        let image_last_mod_time =
+            FileTime::from_last_modification_time(&fs::metadata(image_file).unwrap());
+        assert_eq!(1609441200, image_last_mod_time.seconds());
     }
 }
