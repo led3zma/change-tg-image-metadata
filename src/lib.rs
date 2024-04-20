@@ -12,7 +12,8 @@ pub fn read_image_path(path: &str) -> Result<Vec<OsString>, Box<dyn std_error>> 
         })
         .filter(|path| {
             let path = &path.to_str().unwrap();
-            path.contains(".jpg") || path.contains(".png") || path.contains(".jpeg")
+            !path.contains("_thumb.")
+                && (path.contains(".jpg") || path.contains(".png") || path.contains(".jpeg"))
         })
         .collect())
 }
@@ -53,7 +54,10 @@ mod tests {
                 .iter()
                 .filter(|&file| {
                     let file = &file.to_str().unwrap();
-                    !file.contains(".jpg") && !file.contains(".png") && !file.contains(".jpeg")
+                    file.contains("_thumb.")
+                        || (!file.contains(".jpg")
+                            && !file.contains(".png")
+                            && !file.contains(".jpeg"))
                 })
                 .collect::<Vec<_>>()
                 .len()
