@@ -1,4 +1,4 @@
-use std::{error::Error as std_error, ffi::OsString, fs};
+use std::{error::Error as std_error, ffi::OsString, fs, path::Path};
 
 /// Reads a path and returns a Vec containing every file in it
 /// TODO: filter to return only images
@@ -25,11 +25,11 @@ pub fn read_image_path(path: &str) -> Result<Vec<OsString>, Box<dyn std_error>> 
 /// the date and time in the string
 pub fn extract_datetime(file_path: OsString) -> Option<String> {
     Some(
-        file_path
+        Path::new(&file_path)
+            .file_stem()?
             .to_str()?
             .rsplit_once("@")?
             .1
-            .strip_suffix(".jpg")?
             .to_string(),
     )
 }
@@ -40,7 +40,7 @@ mod tests {
 
     #[test]
     fn handle_invalid_image_path() {
-        let path = "./test_folder/Image_test.png";
+        let path = "./test_folder/photo@31-12-2020_19-00-00.png";
         assert!(read_image_path(path).is_err());
     }
 
@@ -65,7 +65,7 @@ mod tests {
     fn extract_raw_datetime_from_filename() {
         let image_file = read_image_path("./test_folder/").unwrap().pop().unwrap();
         assert_eq!(
-            String::from("17-08-2020_11-47-27"),
+            String::from("31-12-2020_19-00-00"),
             extract_datetime(image_file).unwrap()
         );
     }
