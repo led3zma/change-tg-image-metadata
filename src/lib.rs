@@ -26,6 +26,7 @@ pub fn update_time_metadata(file_path: OsString) -> Result<(), std::io::Error> {
     filetime::set_file_mtime(
         &file_path,
         FileTime::from_unix_time(
+            // TODO #5 Fix update_time_metadata to correctly handle an error if an extraction of a file name's datetime fails due to incorrect pattern or format
             get_timestamp(extract_datetime(&file_path).unwrap()).unwrap(),
             0,
         ),
