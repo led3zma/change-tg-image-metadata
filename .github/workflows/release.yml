@@ -30,7 +30,7 @@ jobs:
             clux/muslrust:stable \
             cargo build --release --target ${{ matrix.target }}
       - name: Pack binaries to tar.gz
-        run: tar cvzf telegram-image-metadata-${{ github.ref_name }}-${{ matrix.target }}.tar.gz -C target/${{ matrix.target }}/release/ telegram-image-metadata
+        run: tar cvzf telegram-image-metadata-${{ github.ref_name }}-${{ matrix.target }}.tar.gz -C target/${{ matrix.target }}/release/telegram-image-metadata
       - name: Upload packaged binaries
         uses: actions/upload-artifact@v2
         with:
