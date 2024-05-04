@@ -22,12 +22,12 @@ pub fn read_image_path(path: &str) -> Result<Vec<OsString>, Box<dyn std_error>> 
 }
 
 /// Gets a file path and updates its modified time metadata by extracting the datetime in its file name and parsing it into timestamp
-pub fn update_time_metadata(file_path: OsString) -> Result<(), std::io::Error> {
+pub fn update_time_metadata(file_path: OsString, datetime: String) -> Result<(), std::io::Error> {
     filetime::set_file_mtime(
         &file_path,
         FileTime::from_unix_time(
             // TODO #5 Fix update_time_metadata to correctly handle an error if an extraction of a file name's datetime fails due to incorrect pattern or format
-            get_timestamp(extract_datetime(&file_path).unwrap()).unwrap(),
+            get_timestamp(datetime).unwrap(),
             0,
         ),
     )
