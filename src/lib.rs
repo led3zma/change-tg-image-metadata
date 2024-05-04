@@ -93,27 +93,36 @@ mod tests {
 
     #[test]
     fn extract_raw_datetime_from_filename() {
-        let image_file = read_image_path("./test_folder/").unwrap().pop().unwrap();
-        assert_eq!(
-            String::from("31-12-2020_19-00-00"),
-            extract_datetime(&image_file).unwrap()
-        );
+        let image_file = extract_datetime(&OsString::from(
+            "test_folder/photo_1@31-12-2020_19-00-00.png",
+        ));
+        assert_eq!(String::from("31-12-2020_19-00-00"), image_file.unwrap());
+        let image_file = extract_datetime(&OsString::from(
+            "test_folder/photo_131-12-2020_19-00-00.png",
+        ));
+        assert!(image_file.is_none());
     }
 
     #[test]
     fn get_timestamp_from_filename_raw_datetime() {
-        let image_datetime =
-            extract_datetime(&read_image_path("./test_folder/").unwrap().pop().unwrap()).unwrap();
+        let image_datetime = extract_datetime(&OsString::from(
+            "test_folder/photo_1@31-12-2020_19-00-00.png",
+        ))
+        .unwrap();
         assert_eq!(1609441200, get_timestamp(image_datetime).unwrap());
     }
 
     #[test]
     fn change_modified_time_from_file_metadata() {
-        let image_file = read_image_path("./test_folder").unwrap().pop().unwrap();
+        let image_file = OsString::from("test_folder/photo_1@31-12-2020_19-00-00.png");
+
         // Just to ensure it has an arbitrary modification time before setting the actual time
         filetime::set_file_mtime(&image_file, FileTime::from_unix_time(100000, 0)).unwrap();
-        update_time_metadata(image_file).unwrap();
-        let image_file = read_image_path("./test_folder").unwrap().pop().unwrap();
+
+        let extracted_datetime = extract_datetime(&image_file).unwrap();
+        update_time_metadata(image_file, extracted_datetime).unwrap();
+
+        let image_file = OsString::from("test_folder/photo_1@31-12-2020_19-00-00.png");
         let image_last_mod_time =
             FileTime::from_last_modification_time(&fs::metadata(image_file).unwrap());
         assert_eq!(1609441200, image_last_mod_time.seconds());
