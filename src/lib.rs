@@ -39,7 +39,7 @@ pub fn update_time_metadata(file_path: OsString) -> Result<(), std::io::Error> {
 ///
 /// NOTE: If for some reason the telegram file export changes this format, it would be better to use regex to match
 /// the date and time in the string
-fn extract_datetime(file_path: &OsString) -> Option<String> {
+pub fn extract_datetime(file_path: &OsString) -> Option<String> {
     Some(
         Path::new(&file_path)
             .file_stem()?
