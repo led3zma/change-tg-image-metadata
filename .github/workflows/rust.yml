@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Start of CI Workflow
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
       - name: Prep phase
         run: cargo install cargo-audit
       - name: Build project
