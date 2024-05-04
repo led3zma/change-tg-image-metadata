@@ -26,8 +26,8 @@ pub fn update_time_metadata(file_path: OsString, datetime: String) -> Result<(),
     filetime::set_file_mtime(
         &file_path,
         FileTime::from_unix_time(
-            // TODO #5 Fix update_time_metadata to correctly handle an error if an extraction of a file name's datetime fails due to incorrect pattern or format
-            get_timestamp(datetime).unwrap(),
+            get_timestamp(datetime)
+                .expect("Should only contain correctly extracted datetimes from file path"),
             0,
         ),
     )
@@ -52,11 +52,7 @@ pub fn extract_datetime(file_path: &OsString) -> Option<String> {
 
 /// Return the timestamp equivalent of the raw datetime extracted from a file name
 fn get_timestamp(datetime: String) -> Result<i64, chrono::ParseError> {
-    Ok(
-        NaiveDateTime::parse_from_str(&datetime, "%d-%m-%Y_%H-%M-%S")
-            .unwrap()
-            .timestamp(),
-    )
+    Ok(NaiveDateTime::parse_from_str(&datetime, "%d-%m-%Y_%H-%M-%S")?.timestamp())
 }
 
 #[cfg(test)]

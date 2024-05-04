@@ -17,7 +17,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     files.into_iter().for_each(|file_path| {
         if let Some(extracted_datetime) = extract_datetime(&file_path) {
-            update_time_metadata(file_path, extracted_datetime).unwrap()
+            update_time_metadata(file_path, extracted_datetime)
+                .expect("An error has ocurred while updating the metadata of a file")
         }
     });
     Ok(())
