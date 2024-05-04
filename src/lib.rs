@@ -24,7 +24,7 @@ pub fn read_image_path(path: &str) -> Result<Vec<OsString>, Box<dyn std_error>> 
 /// Gets a file path and updates its modified time metadata by extracting the datetime in its file name and parsing it into timestamp
 pub fn update_time_metadata(file_path: OsString, datetime: String) -> Result<(), std::io::Error> {
     filetime::set_file_mtime(
-        &file_path,
+        file_path,
         FileTime::from_unix_time(
             get_timestamp(datetime)
                 .expect("Should only contain correctly extracted datetimes from file path"),
@@ -44,7 +44,7 @@ pub fn extract_datetime(file_path: &OsString) -> Option<String> {
         Path::new(&file_path)
             .file_stem()?
             .to_str()?
-            .rsplit_once("@")?
+            .rsplit_once('@')?
             .1
             .to_string(),
     )
@@ -81,9 +81,7 @@ mod tests {
                             && !file.contains(".png")
                             && !file.contains(".jpeg"))
                 })
-                .collect::<Vec<_>>()
-                .len()
-                == 0
+                .collect::<Vec<_>>().is_empty()
         );
     }
 
