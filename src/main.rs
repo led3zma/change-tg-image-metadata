@@ -1,7 +1,7 @@
 use std::error::Error;
 
+use change_tg_image_metadata::{extract_datetime, read_image_path, update_time_metadata};
 use clap::{command, Parser};
-use telegram_image_metadata::{extract_datetime, read_image_path, update_time_metadata};
 
 #[derive(Parser, Debug)]
 #[command(version, about)]

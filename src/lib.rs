@@ -52,7 +52,11 @@ pub fn extract_datetime(file_path: &OsString) -> Option<String> {
 
 /// Return the timestamp equivalent of the raw datetime extracted from a file name
 fn get_timestamp(datetime: String) -> Result<i64, chrono::ParseError> {
-    Ok(NaiveDateTime::parse_from_str(&datetime, "%d-%m-%Y_%H-%M-%S")?.timestamp())
+    Ok(
+        NaiveDateTime::parse_from_str(&datetime, "%d-%m-%Y_%H-%M-%S")?
+            .and_utc()
+            .timestamp(),
+    )
 }
 
 #[cfg(test)]
@@ -70,19 +74,16 @@ mod tests {
     #[test]
     fn collect_only_images() {
         let path = "./test_folder/";
-        assert!(
-            read_image_path(path)
-                .unwrap()
-                .iter()
-                .filter(|&file| {
-                    let file = &file.to_str().unwrap();
-                    file.contains("_thumb.")
-                        || (!file.contains(".jpg")
-                            && !file.contains(".png")
-                            && !file.contains(".jpeg"))
-                })
-                .collect::<Vec<_>>().is_empty()
-        );
+        assert!(read_image_path(path)
+            .unwrap()
+            .iter()
+            .filter(|&file| {
+                let file = &file.to_str().unwrap();
+                file.contains("_thumb.")
+                    || (!file.contains(".jpg") && !file.contains(".png") && !file.contains(".jpeg"))
+            })
+            .collect::<Vec<_>>()
+            .is_empty());
     }
 
     #[test]
