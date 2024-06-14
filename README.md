@@ -9,15 +9,15 @@ This program aims to help fix this, taking advantage of the file format of the e
 You may wonder why it is written in Rust if its simple enough to be written in something like Python (which I could probably do in a future). This is part of my learning process of Rust, so it is perfectly possible to write this with other tools without any problem or needing an specific requierment or reason.
 
 ## Instalation
-You can download a precompiled binary of the program in the Releases page (for the moment, only gnu-linux and musl-linux binaries are available). Place it in any directory, decompress it with `tar -xzvf` and just run it: `./telegram_image_metadata`.
+You can download a precompiled binary of the program in the Releases page (for the moment, only gnu-linux and musl-linux binaries are available). Place it in any directory, decompress it with `tar -xzvf` and just run it: `./change-tg-image-metadata`.
 
 If you're a Rust developer, you can clone this repository and run the project with `cargo run`.
 
 ## Usage
 Get help message:
 ```
-~$ ./telegram_image_metadata --help
-Usage: telegram_image_metadata <PATH>
+~$ ./change-tg-image-metadata --help
+Usage: change-tg-image-metadata <PATH>
 
 Arguments:
   <PATH>  Path where the images are located
@@ -28,5 +28,5 @@ Options:
 ```
 Run the program to process a directory with images (it will only process the images with the [correct format](#motivation) ignoring thumbnails):
 ```
-~$ ./telegram_image_metadata /path/to/dir
+~$ ./change-tg-image-metadata /path/to/dir
 ```
