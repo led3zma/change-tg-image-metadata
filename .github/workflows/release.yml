@@ -30,13 +30,13 @@ jobs:
             clux/muslrust:stable \
             cargo build --release --target ${{ matrix.target }}
       - name: Pack binaries to tar.gz
-        run: tar cvzf telegram_image_metadata-${{ github.ref_name }}-${{ matrix.target }}.tar.gz target/${{ matrix.target }}/release/telegram_image_metadata
+        run: mv target/${{ matrix.target }}/release/change-tg-image-metadata . && tar cvzf change-tg-image-metadata-${{ github.ref_name }}-${{ matrix.target }}.tar.gz change-tg-image-metadata
       - name: Upload packaged binaries
         uses: actions/upload-artifact@v2
         with:
-          name: telegram_image_metadata-${{ github.ref_name }}-${{ matrix.target }}
+          name: change-tg-image-metadata-${{ github.ref_name }}-${{ matrix.target }}
           path: |
-            telegram_image_metadata-${{ github.ref_name }}-${{ matrix.target }}.tar.gz
+            change-tg-image-metadata-${{ github.ref_name }}-${{ matrix.target }}.tar.gz
           if-no-files-found: error
 
   create-release:
@@ -48,10 +48,10 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Layout
         run: |
-          mv telegram_image_metadata-${{ github.ref_name }}-x86_64-unknown-linux-musl/telegram_image_metadata-${{ github.ref_name }}-x86_64-unknown-linux-musl.tar.gz ./telegram_image_metadata-${{ github.ref_name }}-musl.tar.gz
-          mv telegram_image_metadata-${{ github.ref_name }}-x86_64-unknown-linux-gnu/telegram_image_metadata-${{ github.ref_name }}-x86_64-unknown-linux-gnu.tar.gz ./telegram_image_metadata-${{ github.ref_name }}-gnu.tar.gz
+          mv change-tg-image-metadata-${{ github.ref_name }}-x86_64-unknown-linux-musl/change-tg-image-metadata-${{ github.ref_name }}-x86_64-unknown-linux-musl.tar.gz ./change-tg-image-metadata-${{ github.ref_name }}-musl.tar.gz
+          mv change-tg-image-metadata-${{ github.ref_name }}-x86_64-unknown-linux-gnu/change-tg-image-metadata-${{ github.ref_name }}-x86_64-unknown-linux-gnu.tar.gz ./change-tg-image-metadata-${{ github.ref_name }}-gnu.tar.gz
 
-          rm -rf telegram_image_metadata-${{ github.ref_name }}-x86_64-unknown-linux-musl telegram_image_metadata-${{ github.ref_name }}-x86_64-unknown-linux-gnu
+          rm -rf change-tg-image-metadata-${{ github.ref_name }}-x86_64-unknown-linux-musl change-tg-image-metadata-${{ github.ref_name }}-x86_64-unknown-linux-gnu
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -62,5 +62,5 @@ jobs:
           draft: true
           fail_on_unmatched_files: true
           files: |
-            telegram_image_metadata-${{ github.ref_name }}-musl.tar.gz
-            telegram_image_metadata-${{ github.ref_name }}-gnu.tar.gz
+            change-tg-image-metadata-${{ github.ref_name }}-musl.tar.gz
+            change-tg-image-metadata-${{ github.ref_name }}-gnu.tar.gz
