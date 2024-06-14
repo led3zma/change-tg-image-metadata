@@ -30,7 +30,7 @@ jobs:
             clux/muslrust:stable \
             cargo build --release --target ${{ matrix.target }}
       - name: Pack binaries to tar.gz
-        run: tar cvzf change-tg-image-metadata-${{ github.ref_name }}-${{ matrix.target }}.tar.gz target/${{ matrix.target }}/release/change-tg-image-metadata
+        run: mv target/${{ matrix.target }}/release/change-tg-image-metadata . && tar cvzf change-tg-image-metadata-${{ github.ref_name }}-${{ matrix.target }}.tar.gz change-tg-image-metadata
       - name: Upload packaged binaries
         uses: actions/upload-artifact@v2
         with:
